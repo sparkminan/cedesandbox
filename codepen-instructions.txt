@@ -1,0 +1,13 @@
+=== CodePenで開く手順 ===
+
+1. https://codepen.io/pen/ にアクセス
+2. 左上の "HTML" タブをクリック
+3. 下記のHTMLコード全体をコピー＆ペースト
+4. 右側にプレビューが表示されます
+5. 保存する場合は "Save" をクリック（CodePenアカウントが必要）
+
+または、以下の方法でも開けます：
+- JSFiddle: https://jsfiddle.net/
+- Glitch: https://glitch.com/
+
+HTMLファイルは /home/user/cedesandbox/index.html にあります
