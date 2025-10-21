@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Deck - アクセス方法</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        h2 {
+            color: #3498db;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+        .url {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+        }
+        ol {
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>📱 Quick Deck アクセス方法</h1>
+        
+        <div class="status warning">
+            <strong>⚠️ GitHub Pagesが見れない場合</strong><br>
+            以下の設定を確認してください
+        </div>
+
+        <h2>1. GitHub設定の確認</h2>
+        <ol>
+            <li>リポジトリ設定 → Settings → Pages</li>
+            <li>Source: "Deploy from a branch" を選択</li>
+            <li>Branch: <code>claude/quick-deck-v1-prototype-011CUKLPZfdDNwLbY58VKkHR</code></li>
+            <li>Folder: <code>/docs</code> を選択</li>
+            <li>Save をクリック</li>
+        </ol>
+
+        <div class="status info">
+            設定後、数分待ってから以下のURLにアクセス
+        </div>
+        
+        <div class="url">
+            https://sparkminan.github.io/cedesandbox/
+        </div>
+
+        <h2>2. すぐに使いたい場合（推奨）</h2>
+        <p>以下のリンクをクリックして、Quick Deckを開いてください：</p>
+        
+        <a href="https://jsfiddle.net/" class="button" target="_blank">
+            JSFiddle で開く
+        </a>
+        
+        <a href="https://codepen.io/pen/" class="button" target="_blank">
+            CodePen で開く
+        </a>
+
+        <h2>3. ローカルサーバー（同じWi-Fi内）</h2>
+        <div class="url">
+            http://21.0.0.100:8080/index.html
+        </div>
+        <p style="font-size: 14px; color: #666;">
+            ※ iPhoneとコンピューターが同じWi-Fiに接続している必要があります
+        </p>
+
+        <h2>4. リポジトリが Private の可能性</h2>
+        <ol>
+            <li>GitHub リポジトリ → Settings → General</li>
+            <li>一番下の "Danger Zone"</li>
+            <li>"Change repository visibility" で Public に変更</li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <h2>📞 トラブルシューティング</h2>
+        <p><strong>問題:</strong> GitHub Pages のURLにアクセスできない</p>
+        <p><strong>原因候補:</strong></p>
+        <ul>
+            <li>リポジトリが Private になっている</li>
+            <li>GitHub Pages の設定が完了していない</li>
+            <li>デプロイに時間がかかっている（最大5分程度）</li>
+            <li>ブランチ名が長すぎる</li>
+        </ul>
+        
+        <p><strong>解決策:</strong></p>
+        <p>下記のCodePenリンクから直接アクセスすることをお勧めします。</p>
+    </div>
+</body>
+</html>
