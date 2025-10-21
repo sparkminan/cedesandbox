@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Deck (クイックデッキ) - v1 Prototype</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header with tabs */
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            padding: 15px 20px 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+        }
+
+        .tab-button {
+            background: #34495e;
+            color: #ecf0f1;
+            border: none;
+            padding: 12px 30px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: #3d5869;
+        }
+
+        .tab-button.active {
+            background: #f5f5f5;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+        }
+
+        /* Main content area */
+        .content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .view {
+            display: none;
+            height: 100%;
+            width: 100%;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        /* AI Co-Pilot View */
+        .ai-view {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .ai-form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .ai-form-container h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .generate-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .generate-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading-message {
+            text-align: center;
+            margin-top: 15px;
+            color: #667eea;
+            font-weight: 500;
+            display: none;
+        }
+
+        .loading-message.show {
+            display: block;
+        }
+
+        /* Manual Editor View */
+        .editor-view {
+            display: flex;
+            height: 100%;
+        }
+
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-right: 2px solid #ddd;
+        }
+
+        .editor-pane h3 {
+            background: #34495e;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        #markdown-input {
+            flex: 1;
+            border: none;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            line-height: 1.6;
+        }
+
+        #markdown-input:focus {
+            outline: none;
+        }
+
+        .preview-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .preview-pane h3 {
+            background: #34495e;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        #slide-preview {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reveal {
+            width: 100%;
+            height: 100%;
+        }
+
+        .reveal .slides {
+            text-align: left;
+        }
+
+        /* Navigation hint */
+        .navigation-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 100;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .editor-view {
+                flex-direction: column;
+            }
+
+            .editor-pane,
+            .preview-pane {
+                flex: 1;
+            }
+
+            .editor-pane {
+                border-right: none;
+                border-bottom: 2px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with tabs -->
+        <div class="header">
+            <h1>Quick Deck (クイックデッキ)</h1>
+            <div class="tabs">
+                <button class="tab-button active" data-view="ai-view">AIアジェンダ生成</button>
+                <button class="tab-button" data-view="editor-view">マニュアル編集</button>
+            </div>
+        </div>
+
+        <!-- Main content area -->
+        <div class="content">
+            <!-- AI Co-Pilot View -->
+            <div id="ai-view" class="view active">
+                <div class="ai-view">
+                    <div class="ai-form-container">
+                        <h2>🤖 AIでアジェンダを自動生成</h2>
+                        <form id="ai-form">
+                            <div class="form-group">
+                                <label for="meeting-theme">会議のテーマ</label>
+                                <input
+                                    type="text"
+                                    id="meeting-theme"
+                                    placeholder="例：2025年下期 新商品企画会議"
+                                    required
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="meeting-goal">会議のゴール</label>
+                                <input
+                                    type="text"
+                                    id="meeting-goal"
+                                    placeholder="例：コンセプトを3つに絞る"
+                                    required
+                                >
+                            </div>
+                            <div class="form-group">
+                                <label for="meeting-topics">話したいトピック・キーワード</label>
+                                <textarea
+                                    id="meeting-topics"
+                                    placeholder="例：Z世代のトレンド、競合A社の分析、ブレスト、タイパ重視"
+                                    required
+                                ></textarea>
+                            </div>
+                            <button type="submit" class="generate-button" id="generate-btn">
+                                AIにアジェンダを作成させる
+                            </button>
+                            <div class="loading-message" id="loading-message">
+                                🔄 AIがアジェンダを生成中...
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Editor View -->
+            <div id="editor-view" class="view">
+                <div class="editor-view">
+                    <div class="editor-pane">
+                        <h3>📝 Markdown エディター</h3>
+                        <textarea id="markdown-input" placeholder="ここにMarkdownを入力してください...
+
+例：
+# タイトル
+
+## セクション
+- ポイント1
+- ポイント2
+
+---
+
+## 次のスライド
+- 新しいスライドは --- で区切ります"></textarea>
+                    </div>
+                    <div class="preview-pane">
+                        <h3>👁️ プレビュー</h3>
+                        <div id="slide-preview">
+                            <div class="reveal">
+                                <div class="slides" id="slides-container"></div>
+                            </div>
+                            <div class="navigation-hint">
+                                ← → キーでスライド移動
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script>
+        // Initialize Reveal.js
+        let revealInstance = null;
+
+        function initReveal() {
+            if (revealInstance) {
+                revealInstance.destroy();
+            }
+
+            revealInstance = new Reveal({
+                embedded: false,
+                controls: true,
+                progress: true,
+                center: true,
+                hash: false,
+                transition: 'slide',
+                width: '100%',
+                height: '100%',
+                margin: 0.1,
+                minScale: 0.2,
+                maxScale: 2.0
+            });
+
+            revealInstance.initialize();
+        }
+
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const views = document.querySelectorAll('.view');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetView = button.dataset.view;
+
+                // Update active tab
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Update active view
+                views.forEach(view => view.classList.remove('active'));
+                document.getElementById(targetView).classList.add('active');
+
+                // Reinitialize Reveal.js when switching to editor view
+                if (targetView === 'editor-view') {
+                    setTimeout(() => {
+                        if (revealInstance) {
+                            revealInstance.layout();
+                        }
+                    }, 100);
+                }
+            });
+        });
+
+        // Markdown to HTML conversion
+        function parseMarkdown(markdown) {
+            // Split by slide separator
+            const slides = markdown.split(/^---$/m);
+
+            return slides.map(slide => {
+                let html = slide.trim();
+
+                // Convert headers
+                html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+                html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+                html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+                // Convert bullet points
+                html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+                html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+
+                // Convert line breaks
+                html = html.replace(/\n\n/g, '</p><p>');
+
+                return `<section>${html}</section>`;
+            }).join('\n');
+        }
+
+        // Update preview
+        function updatePreview(markdown) {
+            const slidesContainer = document.getElementById('slides-container');
+            const htmlContent = parseMarkdown(markdown);
+            slidesContainer.innerHTML = htmlContent;
+
+            // Reinitialize Reveal.js
+            if (revealInstance) {
+                revealInstance.sync();
+                revealInstance.layout();
+            } else {
+                initReveal();
+            }
+        }
+
+        // Real-time preview updates
+        const markdownInput = document.getElementById('markdown-input');
+        markdownInput.addEventListener('input', (e) => {
+            updatePreview(e.target.value);
+        });
+
+        // AI Form submission
+        const aiForm = document.getElementById('ai-form');
+        const generateBtn = document.getElementById('generate-btn');
+        const loadingMessage = document.getElementById('loading-message');
+
+        aiForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get form values
+            const theme = document.getElementById('meeting-theme').value;
+            const goal = document.getElementById('meeting-goal').value;
+            const topics = document.getElementById('meeting-topics').value;
+
+            // Show loading state
+            generateBtn.disabled = true;
+            loadingMessage.classList.add('show');
+
+            // Simulate AI processing delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Generate mock agenda based on user input
+            const generatedMarkdown = generateMockAgenda(theme, goal, topics);
+
+            // Populate editor
+            markdownInput.value = generatedMarkdown;
+            updatePreview(generatedMarkdown);
+
+            // Switch to editor view
+            document.querySelector('[data-view="editor-view"]').click();
+
+            // Reset loading state
+            generateBtn.disabled = false;
+            loadingMessage.classList.remove('show');
+        });
+
+        // Generate mock agenda (simulated AI)
+        function generateMockAgenda(theme, goal, topics) {
+            // Parse topics into array
+            const topicList = topics.split(/[、,，]/).map(t => t.trim()).filter(t => t);
+
+            let markdown = `# ${theme}\n\n`;
+            markdown += `## 本日のゴール\n`;
+            markdown += `- ${goal}\n\n`;
+            markdown += `---\n\n`;
+
+            // Create sections based on topics
+            const sections = [
+                {
+                    title: 'インプット共有',
+                    duration: '15分',
+                    items: topicList.slice(0, 2).length > 0 ? topicList.slice(0, 2) : ['背景情報の共有', '関連データの確認']
+                },
+                {
+                    title: 'ブレインストーミング',
+                    duration: '30分',
+                    items: topicList.length > 2 ?
+                        [`テーマ：「${topicList[topicList.length - 1]}」を中心に`, 'アイデア出し（付箋ツール使用）'] :
+                        ['アイデア出し', '自由討議']
+                },
+                {
+                    title: '議論と絞り込み',
+                    duration: '15分',
+                    items: ['各アイデアの評価とディスカッション', '優先順位の決定']
+                },
+                {
+                    title: '次回までのアクション',
+                    duration: '10分',
+                    items: ['決定事項の確認', '担当者の割り振り', 'スケジュール確認']
+                }
+            ];
+
+            sections.forEach((section, index) => {
+                markdown += `## ${index + 1}. ${section.title} (${section.duration})\n`;
+                section.items.forEach(item => {
+                    markdown += `- ${item}\n`;
+                });
+                markdown += `\n---\n\n`;
+            });
+
+            markdown += `## まとめ\n`;
+            markdown += `- 本日のゴール: ${goal}\n`;
+            markdown += `- 次回会議までに資料準備\n`;
+            markdown += `- ご参加ありがとうございました！\n`;
+
+            return markdown;
+        }
+
+        // Initialize with empty preview
+        initReveal();
+    </script>
+</body>
+</html>
